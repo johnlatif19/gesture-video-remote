@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Remote Video — TV</title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+<body>
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 1: IDLE — show connection code, wait for phone
+       ══════════════════════════════════════════════════════ -->
+  <main id="idle-screen" class="screen idle-screen" aria-live="polite">
+    <header class="idle-header">
+      <h1 class="brand">REMOTE VIDEO</h1>
+      <p class="tagline">Control from your phone</p>
+    </header>
+
+    <section class="code-section" aria-labelledby="code-label">
+      <p id="code-label" class="code-label">CONNECTION CODE</p>
+      <div id="code-display" class="code-display" role="text" aria-label="Connection code">
+        <!-- Filled by JS: 6 digits -->
+        <span class="code-digit">•</span>
+        <span class="code-digit">•</span>
+        <span class="code-digit">•</span>
+        <span class="code-digit">•</span>
+        <span class="code-digit">•</span>
+        <span class="code-digit">•</span>
+      </div>
+    </section>
+
+    <footer class="idle-footer">
+      <div id="status-badge" class="status-badge status--waiting">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-text" class="status-text">Connecting to server…</span>
+      </div>
+      <p class="hint">Open <strong>/camera</strong> on your phone and enter the code above.</p>
+    </footer>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 2: PLAYER — video + minimal overlay
+       ══════════════════════════════════════════════════════ -->
+  <main id="player-screen" class="screen player-screen" hidden>
+    <video
+      id="video"
+      class="video"
+      playsinline
+      preload="metadata"
+      aria-label="Video player"
+    ></video>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon" aria-hidden="true">▶</div>
+      <h2 class="empty-title">No video selected</h2>
+      <p class="empty-hint">Pick one from <strong>/dashboard</strong></p>
+    </div>
+
+    <!-- Minimal overlay: shown briefly on commands -->
+    <div id="overlay" class="overlay" aria-hidden="true">
+      <div id="overlay-icon" class="overlay-icon">▶</div>
+      <div id="overlay-label" class="overlay-label">PLAY</div>
+    </div>
+
+    <!-- Tiny HUD top-right: connection status -->
+    <div class="hud" aria-live="polite">
+      <div id="hud-status" class="hud-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="hud-text">Code: ———</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       Connection lost banner
+       ══════════════════════════════════════════════════════ -->
+  <div id="connection-lost" class="connection-lost" hidden role="alert">
+    <span class="connection-lost-icon" aria-hidden="true">⚠</span>
+    <span class="connection-lost-text">Connection lost. Reconnecting…</span>
+  </div>
+
+  <script src="/js/lib/ws-client.js"></script>
+  <script src="/js/home.js"></script>
+</body>
+</html>

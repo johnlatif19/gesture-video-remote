@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Remote Video — Controller</title>
+  <link rel="stylesheet" href="/css/camera.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 1: CODE ENTRY
+       ══════════════════════════════════════════════════════ -->
+  <main id="code-screen" class="screen code-screen">
+    <header class="code-header">
+      <h1 class="brand">REMOTE VIDEO</h1>
+      <p class="tagline">Phone Controller</p>
+    </header>
+
+    <section class="code-form" aria-labelledby="enter-code-label">
+      <label id="enter-code-label" class="code-label" for="code-input">
+        Enter TV Code
+      </label>
+
+      <input
+        id="code-input"
+        class="code-input"
+        type="tel"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        autocomplete="one-time-code"
+        placeholder="••••••"
+        aria-describedby="code-error"
+      />
+
+      <p id="code-error" class="code-error" role="alert" hidden></p>
+
+      <button id="connect-btn" class="btn btn--primary btn--lg" type="button">
+        Connect
+      </button>
+    </section>
+
+    <footer class="code-footer">
+      <p class="hint">Look at the code on your TV screen.</p>
+    </footer>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 2: CONTROLLER
+       ══════════════════════════════════════════════════════ -->
+  <main id="controller-screen" class="screen controller-screen" hidden>
+
+    <!-- Connection status bar -->
+    <div id="conn-bar" class="conn-bar" aria-live="polite">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="conn-text">Connected to TV</span>
+      <span id="conn-code" class="conn-code">#------</span>
+    </div>
+
+    <!-- Camera preview -->
+    <section class="camera-wrap" aria-label="Gesture camera">
+      <video
+        id="cam-preview"
+        class="cam-preview"
+        autoplay
+        playsinline
+        muted
+      ></video>
+      <canvas id="cam-canvas" class="cam-canvas" hidden></canvas>
+
+      <!-- Camera state overlays -->
+      <div id="cam-loading" class="cam-overlay">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Starting camera…</p>
+      </div>
+
+      <div id="cam-error" class="cam-overlay cam-overlay--error" hidden>
+        <p id="cam-error-text">Camera unavailable</p>
+        <button id="cam-retry-btn" class="btn btn--ghost" type="button">
+          Retry
+        </button>
+      </div>
+    </section>
+
+    <!-- Gesture status -->
+    <section class="gesture-panel" aria-live="polite">
+      <div class="gesture-row">
+        <span class="gesture-label">Detected gesture:</span>
+        <span id="gesture-value" class="gesture-value gesture-value--idle">
+          — none —
+        </span>
+      </div>
+      <div class="gesture-row">
+        <span class="gesture-label">Action:</span>
+        <span id="gesture-action" class="gesture-action">—</span>
+      </div>
+    </section>
+
+    <!-- Playback state (from TV) -->
+    <section class="state-panel" aria-live="polite">
+      <span class="state-item">
+        <span class="state-label">State</span>
+        <span id="state-playback" class="state-value">—</span>
+      </span>
+      <span class="state-item">
+        <span class="state-label">Time</span>
+        <span id="state-time" class="state-value">0:00</span>
+      </span>
+      <span class="state-item">
+        <span class="state-label">Vol</span>
+        <span id="state-volume" class="state-value">100%</span>
+      </span>
+    </section>
+
+    <!-- Manual controls -->
+    <section class="controls" aria-label="Manual controls">
+      <!-- Row 1: Seek + Restart -->
+      <div class="controls-row">
+        <button class="btn btn--ctrl" data-command="SEEK_BACKWARD" type="button">
+          <span class="btn-icon">⏪</span>
+          <span class="btn-label">10s</span>
+        </button>
+        <button class="btn btn--ctrl" data-command="RESTART" type="button">
+          <span class="btn-icon">↺</span>
+          <span class="btn-label">Restart</span>
+        </button>
+        <button class="btn btn--ctrl" data-command="SEEK_FORWARD" type="button">
+          <span class="btn-icon">⏩</span>
+          <span class="btn-label">10s</span>
+        </button>
+      </div>
+
+      <!-- Row 2: Play + Pause (big) -->
+      <div class="controls-row controls-row--main">
+        <button
+          class="btn btn--primary btn--play"
+          data-command="PLAY"
+          type="button"
+        >
+          <span class="btn-icon">▶</span>
+          <span class="btn-label">PLAY</span>
+        </button>
+        <button
+          class="btn btn--primary btn--pause"
+          data-command="PAUSE"
+          type="button"
+        >
+          <span class="btn-icon">⏸</span>
+          <span class="btn-label">PAUSE</span>
+        </button>
+      </div>
+
+      <!-- Row 3: Volume -->
+      <div class="controls-row">
+        <button class="btn btn--ctrl" data-command="VOLUME_DOWN" type="button">
+          <span class="btn-icon">🔉</span>
+          <span class="btn-label">Vol −</span>
+        </button>
+        <button class="btn btn--ctrl" data-command="MUTE" type="button">
+          <span class="btn-icon">🔇</span>
+          <span class="btn-label">Mute</span>
+        </button>
+        <button class="btn btn--ctrl" data-command="VOLUME_UP" type="button">
+          <span class="btn-icon">🔊</span>
+          <span class="btn-label">Vol +</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Gesture hint -->
+    <footer class="controller-footer">
+      <p class="hint">
+        🤚 <strong>Open Palm</strong> → Play · ✊ <strong>Closed Fist</strong> → Pause
+      </p>
+    </footer>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       Connection lost banner
+       ══════════════════════════════════════════════════════ -->
+  <div id="connection-lost" class="connection-lost" hidden role="alert">
+    <span class="connection-lost-icon" aria-hidden="true">⚠</span>
+    <span class="connection-lost-text">Connection lost. Reconnecting…</span>
+  </div>
+
+  <script src="/js/lib/ws-client.js"></script>
+  <script src="/js/lib/gestures.js"></script>
+  <script src="/js/camera.js"></script>
+</body>
+</html>

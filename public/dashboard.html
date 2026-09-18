@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Remote Video — Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+  <div class="layout">
+
+    <!-- ═══════════════════════════════════════════════════
+         SIDEBAR / HEADER
+         ═══════════════════════════════════════════════════ -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="brand">REMOTE VIDEO</h1>
+        <span class="badge">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <a href="/home" target="_blank" rel="noopener" class="link">
+          Open TV ↗
+        </a>
+        <a href="/camera" target="_blank" rel="noopener" class="link">
+          Open Camera ↗
+        </a>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+         MAIN
+         ═══════════════════════════════════════════════════ -->
+    <main class="main">
+
+      <!-- ─── Upload card ───────────────────────────────── -->
+      <section class="card upload-card" aria-labelledby="upload-title">
+        <h2 id="upload-title" class="card-title">Upload Video</h2>
+
+        <form id="upload-form" class="upload-form">
+          <label
+            for="upload-input"
+            id="dropzone"
+            class="dropzone"
+            tabindex="0"
+            role="button"
+            aria-label="Choose or drop a video file"
+          >
+            <input
+              id="upload-input"
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime,video/x-matroska"
+              hidden
+            />
+            <div class="dropzone-inner">
+              <div class="dropzone-icon" aria-hidden="true">⬆</div>
+              <p class="dropzone-title">Drop a video here or click to browse</p>
+              <p class="dropzone-hint">MP4 · WebM · MOV · up to 200 MB</p>
+              <p id="file-name" class="dropzone-filename" hidden></p>
+            </div>
+          </label>
+
+          <div class="form-row">
+            <label for="title-input" class="form-label">Title</label>
+            <input
+              id="title-input"
+              class="input"
+              type="text"
+              maxlength="120"
+              placeholder="e.g. Movie Night Intro"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="session-input" class="form-label">
+              Session code <span class="optional">(optional)</span>
+            </label>
+            <input
+              id="session-input"
+              class="input input--code"
+              type="tel"
+              inputmode="numeric"
+              maxlength="6"
+              pattern="[0-9]*"
+              placeholder="583214"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button
+              id="upload-btn"
+              class="btn btn--primary"
+              type="submit"
+            >
+              Upload
+            </button>
+            <button
+              id="upload-cancel"
+              class="btn btn--ghost"
+              type="button"
+              hidden
+            >
+              Cancel
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div id="upload-progress" class="progress" hidden>
+            <div class="progress-bar">
+              <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="progress-text">Uploading… 0%</p>
+          </div>
+
+          <p id="upload-message" class="form-message" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <!-- ─── Video list ────────────────────────────────── -->
+      <section class="card list-card" aria-labelledby="list-title">
+        <div class="list-header">
+          <h2 id="list-title" class="card-title">
+            Videos <span id="video-count" class="count">0</span>
+          </h2>
+          <button id="refresh-btn" class="btn btn--ghost btn--sm" type="button">
+            ↻ Refresh
+          </button>
+        </div>
+
+        <!-- Empty state -->
+        <div id="list-empty" class="list-empty">
+          <div class="empty-icon" aria-hidden="true">🎬</div>
+          <p>No videos yet. Upload one to get started.</p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="list-loading" class="list-loading" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Loading videos…</p>
+        </div>
+
+        <!-- Grid -->
+        <ul id="video-grid" class="video-grid" hidden></ul>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       Preview modal
+       ═══════════════════════════════════════════════════ -->
+  <div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-body">
+      <header class="modal-header">
+        <h3 id="modal-title" class="modal-title">Preview</h3>
+        <button class="modal-close" data-close type="button" aria-label="Close">✕</button>
+      </header>
+      <video id="modal-video" class="modal-video" controls playsinline></video>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
