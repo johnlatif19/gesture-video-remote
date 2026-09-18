@@ -57,7 +57,7 @@ app.use('/api', (_req, res) => {
 // ─── HTTP + WebSocket Server ─────────────────────────────
 const server = http.createServer(app);
 
-// ✅ Auto-attach upgrade handler (ws does this automatically when "server" is passed)
+// ws auto-attaches the upgrade handler when "server" is passed
 const wss = new WebSocketServer({
   server,
   path: '/ws',
@@ -97,13 +97,14 @@ wss.on('connection', (socket) => {
   });
 });
 
+// Heartbeat: 15s to survive Railway proxy timeouts
 const heartbeat = setInterval(() => {
   wss.clients.forEach((socket) => {
     if (socket.isAlive === false) return socket.terminate();
     socket.isAlive = false;
     socket.ping();
   });
-}, 30000);
+}, 15000);
 
 const expirySweep = wsHandler.startExpirySweep(60_000);
 
