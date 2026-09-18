@@ -56,7 +56,24 @@ app.use('/api', (_req, res) => {
 
 // ─── HTTP + WebSocket Server ─────────────────────────────
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server, path: '/ws' });
+
+const wss = new WebSocketServer({
+  server,
+  path: '/ws',
+  perMessageDeflate: false,   // ← مهم للـ Railway proxy
+  clientTracking: true,
+});
+
+// Explicit upgrade handler — needed behind some proxies
+server.on('upgrade', (req, socket, head) => {
+  if (req.url === '/ws' || req.url.startsWith('/ws?')) {
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req);
+    });
+  } else {
+    socket.destroy();
+  }
+});
 
 wss.on('connection', (socket) => {
   socket.isAlive = true;
@@ -107,7 +124,7 @@ wss.on('close', () => {
 });
 
 // ─── Start ───────────────────────────────────────────────
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {           // ← مهم للـ Railway
   console.log(`✅ Server running on port ${PORT} (${NODE_ENV})`);
   console.log(`   Home:      http://localhost:${PORT}/home`);
   console.log(`   Camera:    http://localhost:${PORT}/camera`);
