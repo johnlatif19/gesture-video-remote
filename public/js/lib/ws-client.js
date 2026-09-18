@@ -3,7 +3,7 @@
 
   const RECONNECT_BASE_MS = 500;
   const RECONNECT_MAX_MS = 10000;
-  const HEARTBEAT_INTERVAL_MS = 25000;
+  const HEARTBEAT_INTERVAL_MS = 15000;   // ← 15s to survive proxy timeouts
 
   class WSClient {
     /**
@@ -37,14 +37,12 @@
     }
 
     // ─── Events ──────────────────────────────────────────
-    /** @param {string} event @param {Function} fn */
     on(event, fn) {
       if (!this.listeners.has(event)) this.listeners.set(event, new Set());
       this.listeners.get(event).add(fn);
       return this;
     }
 
-    /** @param {string} event @param {Function} fn */
     off(event, fn) {
       const set = this.listeners.get(event);
       if (!set) return this;
@@ -53,7 +51,6 @@
       return this;
     }
 
-    /** @param {string} event @param {...any} args */
     emit(event, ...args) {
       const set = this.listeners.get(event);
       if (!set) return;
@@ -92,6 +89,7 @@
     _onOpen() {
       this.isOpen = true;
       this.reconnectAttempts = 0;
+      console.log('[WS] open at', new Date().toISOString());
       this.emit('open');
       this._startHeartbeat();
 
@@ -117,6 +115,14 @@
       const wasOpen = this.isOpen;
       this.isOpen = false;
       this._stopHeartbeat();
+
+      console.log('[WS] closed', {
+        code: event.code,
+        reason: event.reason || '(none)',
+        wasOpen,
+        at: new Date().toISOString(),
+      });
+
       this.emit('close', { code: event.code, reason: event.reason, wasOpen });
 
       if (this.shouldReconnect && event.code !== 1000) {
@@ -129,7 +135,6 @@
     }
 
     // ─── Send ────────────────────────────────────────────
-    /** @param {object} message */
     send(message) {
       if (!this.isOpen || !this.socket) {
         this.queue.push(message);
